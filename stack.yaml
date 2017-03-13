@@ -1,0 +1,9 @@
+resolver: lts-8.2
+packages:
+- '.'
+extra-deps:
+- derive-2.5.26
+- haskell-src-exts-1.17.1
+extra-package-dbs: []
+nix:
+    enable: true

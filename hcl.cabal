@@ -1,0 +1,70 @@
+name:                   hcl
+version:                0.1.0.0
+homepage:               https://github.com/seanparsons/hcl
+license:                BSD3
+license-file:           LICENSE
+author:                 Sean Parsons
+maintainer:             github@futurenotfound.com
+copyright:              2017 Sean Parsons
+category:               Deployment
+build-type:             Simple
+extra-source-files:     README.md
+cabal-version:          >=1.10
+
+library
+  hs-source-dirs:       src
+  exposed-modules:      HCL
+                      , HCL.Types
+                      , HCL.Parser
+                      , HCL.PrettyPrint
+  default-language:     Haskell2010
+  default-extensions:   OverloadedStrings
+                      , ViewPatterns
+                      , TypeSynonymInstances
+                      , FlexibleInstances
+                      , StandaloneDeriving
+                      , MultiParamTypeClasses
+                      , DeriveGeneric
+                      , TemplateHaskell
+                      , InstanceSigs
+  ghc-options:          -Wall -fno-warn-orphans
+  build-depends:        base >= 4.7 && < 5
+                      , hashable
+                      , scientific
+                      , bytestring
+                      , text
+                      , unordered-containers
+                      , megaparsec
+                      , pretty
+
+test-suite hcl-test
+  type:                 exitcode-stdio-1.0
+  hs-source-dirs:       test
+  main-is:              Tasty.hs
+  other-modules:        HCLTest
+  build-depends:        base >= 4.7 && < 5
+                      , hcl
+                      , hashable
+                      , scientific
+                      , bytestring
+                      , text
+                      , unordered-containers
+                      , megaparsec
+                      , tasty-discover
+                      , tasty-quickcheck
+                      , QuickCheck
+                      , quickcheck-instances
+                      , tasty-th
+                      , tasty
+                      , derive
+  default-language:     Haskell2010
+  default-extensions:   OverloadedStrings
+                      , ViewPatterns
+                      , TypeSynonymInstances
+                      , FlexibleInstances
+                      , StandaloneDeriving
+                      , MultiParamTypeClasses
+                      , DeriveGeneric
+                      , TemplateHaskell
+                      , InstanceSigs
+  ghc-options:          -Wall -fno-warn-orphans
