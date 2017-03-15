@@ -7,10 +7,13 @@ import Test.QuickCheck.Instances()
 import Test.Tasty
 import HCL.Types
 import HCL
-import Data.DeriveTH
 import Data.HashMap.Strict
+import Debug.Trace
 
-derive makeArbitrary ''HCLStringPart
+instance Arbitrary HCLStringPart where
+  arbitrary = oneof [ fmap HCLStringPlain $ fmap pack $ listOf1 arbitrary
+                    , fmap HCLStringInterpolation $ fmap pack $ listOf1 arbitrary
+                    ]
 
 identText :: Gen Text
 identText = fmap pack $ listOf1 $ elements (['a'..'z'] ++ ['A'..'Z'] ++ ['_', '-'])
@@ -50,7 +53,7 @@ instance Arbitrary HCLDocument where
 toHCLAndBack :: TestTree
 toHCLAndBack = testProperty "Printing and re-parsing produces the same document" $ \document ->
                   let printedResult = hclDocumentToText document
-                      parsedResult = parseHCL "test" printedResult
+                      parsedResult = parseHCL "test" $ traceShow printedResult printedResult
                   in  counterexample ("printedResult = " ++ (show printedResult)) $
                       counterexample ("parsedResult = " ++ (show parsedResult)) $
                       (parsedResult == Right document)
