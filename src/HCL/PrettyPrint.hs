@@ -23,16 +23,11 @@ instance Pretty HCLObject where
 instance Pretty HCLValue where
   pPrint v = case v of
     HCLNumber n         -> text $ show n
-    HCLString ps        -> "\"" <> (hcat $ map pPrint ps) <> "\""
+    HCLString ps        -> text $ show ps
     HCLBoolean True     -> text "true"
     HCLBoolean False    -> text "false"
     HCLObjectValue obj  -> pPrint obj
     HCLList vs          -> "[" <> (hcat $ punctuate comma $ map pPrint vs) <> "]"
-
-instance Pretty HCLStringPart where
-  pPrint s = case s of
-    HCLStringPlain plainText                -> text $ T.unpack plainText
-    HCLStringInterpolation interpolatedText -> "${" <> text (T.unpack interpolatedText) <> "}"
 
 pPrintKey :: T.Text -> Doc
 pPrintKey key =

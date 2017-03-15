@@ -16,16 +16,12 @@ data HCLObject = HCLObject [Text] HCLMapContent
 
 data HCLValue = HCLNumber Scientific
               | HCLBoolean Bool
-              | HCLString [HCLStringPart]
+              | HCLString Text
               | HCLObjectValue HCLObject
               | HCLList [HCLValue]
               deriving (Generic, Show, Eq, Ord)
 
 type HCLList = [HCLValue]
-
-data HCLStringPart = HCLStringPlain Text
-                   | HCLStringInterpolation Text
-                   deriving (Generic, Show, Eq, Ord)
 
 newtype HCLDocument = HCLDocument [HCLObject]
                       deriving (Generic, Show, Eq, Ord)

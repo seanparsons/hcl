@@ -21,8 +21,7 @@ value = label "HCL - value" $ try number
                             <|> HCLBoolean <$> try boolean
                             <|> HCLObjectValue <$> try object
                             <|> HCLList <$> try list
-                            <|> HCLString <$> try stringParts
-                            <|> HCLString <$> (stringPlainMultiline >>= \s -> return [HCLStringPlain s])
+                            <|> HCLString <$> string
 
 boolean :: Parser Bool
 boolean = label "HCL - boolean" $ try (fmap (const True) (Megaparsec.string "true"))
@@ -79,43 +78,21 @@ comma = surroundedBySpace $ vchar ','
 quote :: Parser ()
 quote = vchar '"'
 
-stringParts :: Parser [HCLStringPart]
-stringParts = label "HCL - stringParts" $ do
-  _ <- quote
-  manyTill stringPart quote
-
-stringPart :: Parser HCLStringPart
-stringPart = label "HCL - stringPart" $ try (HCLStringInterpolation <$> stringInterp)
-                                      <|> HCLStringPlain <$> stringPlain
-
-stringInterp :: Parser Text
-stringInterp = label "HCL - stringInterp" $ do
-  _ <- Megaparsec.string "${"
-  Text.pack <$> manyTill anyChar (Megaparsec.string "}")
-
-stringPlain :: Parser Text
-stringPlain = label "HCL - stringPlain" $ do
-  let end =
-          try (lookAhead eof)
-          <|> void (try (lookAhead (Megaparsec.string "${")))
-          <|> void (try (lookAhead quote))
-  s <- manyTill Lexer.charLiteral end
-  return $ Text.pack s
-
-stringPlainMultiline :: Parser Text
-stringPlainMultiline = label "HCL - stringPlainMultiline" $ do
+stringMultiline :: Parser Text
+stringMultiline = label "HCL - stringMultiline" $ do
   _ <- Megaparsec.string "<<"
   multilineBounds <- manyTill anyChar eol
   Text.pack <$> manyTill Lexer.charLiteral
       (try (skipSpace >> Megaparsec.string multilineBounds))
 
+stringPlain :: Parser Text
+stringPlain = label "HCL - stringPlain" $ do
+  _ <- quote
+  s <- manyTill Lexer.charLiteral quote
+  return $ Text.pack s
+
 string :: Parser Text
-string = label "HCL - string" $ try stringPlainMultiline <|> str
-  where
-    str = do
-        _ <- quote
-        s <- manyTill Lexer.charLiteral quote
-        return $ Text.pack s
+string = label "HCL - string" $ try stringMultiline <|> stringPlain
 
 number :: Parser HCLValue
 number = label "HCL - number" (HCLNumber <$> (Lexer.signed skipSpace Lexer.number))

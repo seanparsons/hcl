@@ -8,12 +8,6 @@ import Test.Tasty
 import HCL.Types
 import HCL
 import Data.HashMap.Strict
-import Debug.Trace
-
-instance Arbitrary HCLStringPart where
-  arbitrary = oneof [ fmap HCLStringPlain $ fmap pack $ listOf1 arbitrary
-                    , fmap HCLStringInterpolation $ fmap pack $ listOf1 arbitrary
-                    ]
 
 identText :: Gen Text
 identText = fmap pack $ listOf1 $ elements (['a'..'z'] ++ ['A'..'Z'] ++ ['_', '-'])
@@ -24,7 +18,7 @@ objectKey = listOf1 identText
 notNestedValue :: Gen HCLValue
 notNestedValue = oneof [ fmap HCLNumber arbitrary
                        , fmap HCLBoolean arbitrary
-                       , fmap HCLString $ scale capSize $ listOf arbitrary
+                       , fmap HCLString arbitrary
                        ]
 
 capSize :: Int -> Int
@@ -53,7 +47,7 @@ instance Arbitrary HCLDocument where
 toHCLAndBack :: TestTree
 toHCLAndBack = testProperty "Printing and re-parsing produces the same document" $ \document ->
                   let printedResult = hclDocumentToText document
-                      parsedResult = parseHCL "test" $ traceShow printedResult printedResult
+                      parsedResult = parseHCL "test" printedResult
                   in  counterexample ("printedResult = " ++ (show printedResult)) $
                       counterexample ("parsedResult = " ++ (show parsedResult)) $
                       (parsedResult == Right document)
